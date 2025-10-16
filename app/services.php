@@ -1,26 +1,26 @@
 <?php
 
-declare(strict_types=1);
-
-use App\Application\Settings\SettingsInterface;
+use App\Domain\AddressRequest\AddressRequestRepository;
+use App\Services\AddressRequestService;
 use App\Services\DadataClient;
 use DI\ContainerBuilder;
 use Psr\Container\ContainerInterface;
-use Slim\Views\Twig;
+use Psr\Log\LoggerInterface;
 
 return static function (ContainerBuilder $containerBuilder) {
+    /**
+     * Here we define all data services
+     *
+     * @param ContainerBuilder $containerBuilder
+     * @return void
+     */
     $containerBuilder->addDefinitions([
-        'view' => function (ContainerInterface $c) {
-            $settings = $c->get(SettingsInterface::class);
-            $twigSettings = $settings->get('twigger');
-
-            return Twig::create($twigSettings['path'], $twigSettings['settings']);
-        },
-        DadataClient::class => function (ContainerInterface $c) {
-            $settings = $c->get(SettingsInterface::class);
-            $dadataSettings = $settings->get('dadata');
-
-            return new DadataClient($dadataSettings['base_url'], $dadataSettings['token']);
+        AddressRequestService::class => function (ContainerInterface $container) {
+            return new AddressRequestService(
+                $container->get(AddressRequestRepository::class),
+                $container->get(DadataClient::class),
+                $container->get(LoggerInterface::class)
+            );
         }
     ]);
 };
