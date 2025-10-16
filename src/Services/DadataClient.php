@@ -9,6 +9,8 @@ class DadataClient
 {
     private Client $client;
 
+    public const ADDRESS_SEARCH_TYPE = 'address';
+
     public function __construct(string $baseUrl, string $token, int $timeout = 10)
     {
         $headers = [

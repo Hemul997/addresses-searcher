@@ -2,17 +2,14 @@
 
 namespace App\Controllers\Web;
 
+use App\Application\Helpers\InputCleaner;
 use App\Controllers\BaseController;
-use App\Domain\AddressRequest\AddressRequestRepository;
 use App\Services\AddressRequestService;
-use App\Services\DadataClient;
-use GuzzleHttp\Exception\GuzzleException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Log\LoggerInterface;
 use Slim\Views\Twig;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -21,38 +18,33 @@ use Twig\Error\SyntaxError;
 final class AddressRequestController extends BaseController
 {
     private AddressRequestService $service;
+    private Twig $view;
 
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     */
     public function __construct(ContainerInterface $container)
     {
-        $this->service = new AddressRequestService(
-            $container->get(AddressRequestRepository::class),
-            $container->get(DadataClient::class),
-            $container->get(LoggerInterface::class)
-        );
+        $this->view = $container->get('view');
+        $this->service = $container->get(AddressRequestService::class);
         parent::__construct($container);
     }
 
     /**
+     * Метод для рендера основной страницы приложения
+     *
      * @param Request $request
      * @param Response $response
      * @param array $args
      * @return Response
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
      */
     public function index(Request $request, Response $response, array $args): Response
     {
-        /** @var Twig $view */
-        $view = $this->container->get('view');
-        /** @var LoggerInterface $logger */
-        $logger = $this->container->get(LoggerInterface::class);
-
-        $logger->info('Page were open');
-
-        return $view->render(
+        return $this->view->render(
             $response,
             'addresses/search.html.twig',
             ['page_title' => 'Поиск адресов', 'addresses' => $args['addresses'] ?? []]
@@ -60,8 +52,6 @@ final class AddressRequestController extends BaseController
     }
 
     /**
-     * @throws NotFoundExceptionInterface
-     * @throws ContainerExceptionInterface
      * @throws RuntimeError
      * @throws LoaderError
      * @throws SyntaxError
@@ -70,7 +60,9 @@ final class AddressRequestController extends BaseController
     {
         $data = $request->getParsedBody();
 
-        $result = $this->service->search($data);
+        $address = InputCleaner::clean($data['address'] ?? '');
+
+        $result = $this->service->search($address);
 
         return $this->index($request, $response, ['addresses' => $result]);
     }
