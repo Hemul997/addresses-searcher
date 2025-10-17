@@ -6,5 +6,4 @@ use App\Domain\DomainException\DomainException;
 
 class DomainRecordCreatingError extends DomainException
 {
-
 }
