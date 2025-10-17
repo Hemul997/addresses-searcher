@@ -40,6 +40,9 @@ final class DatabaseAddressRequestRepository implements AddressRequestRepository
             ) {
                 $lastInsertId = $this->pdo->lastInsertId();
                 $addressRequest->setId($lastInsertId);
+
+                $this->logger->info("Entry with #id $lastInsertId was succsessfully created");
+
                 return $addressRequest;
             }
         } catch (PDOException $e) {
