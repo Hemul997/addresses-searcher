@@ -1,1 +1,25 @@
-<?phpnamespace App\Domain\AddressRequest;use App\Domain\DomainException\DomainException;use App\Domain\DomainException\DomainRecordCreatingError;interface AddressRequestRepository{    /**     * @param AddressRequest $addressRequest     * @return AddressRequest     * @throws DomainRecordCreatingError     */    public function add(AddressRequest $addressRequest): AddressRequest;    /**     * Метод проверяет, что поисковая строка уникальная в БД     *     * @param string $searchText     * @return bool     * @throws DomainException     */    public function isUniqueSearchText(string $searchText): bool;}
+<?php
+
+namespace App\Domain\AddressRequest;
+
+use App\Domain\DomainException\DomainException;
+use App\Domain\DomainException\DomainRecordCreatingError;
+
+interface AddressRequestRepository
+{
+    /**
+     * @param AddressRequest $addressRequest
+     * @return AddressRequest
+     * @throws DomainRecordCreatingError
+     */
+    public function add(AddressRequest $addressRequest): AddressRequest;
+
+    /**
+     * Метод проверяет, что поисковая строка уникальная в БД
+     *
+     * @param string $searchText
+     * @return bool
+     * @throws DomainException
+     */
+    public function isUniqueSearchText(string $searchText): bool;
+}
