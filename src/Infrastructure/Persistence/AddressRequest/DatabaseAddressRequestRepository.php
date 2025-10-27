@@ -34,14 +34,14 @@ final class DatabaseAddressRequestRepository implements AddressRequestRepository
 
             if (
                 $stmt->execute([
-                'search_text' => $addressRequest->getSearchText(),
-                'created_at' => $addressRequest->getCreatedAt()->format('Y-m-d H:i:s')
+                    'search_text' => $addressRequest->getSearchText(),
+                    'created_at' => $addressRequest->getCreatedAt()->format('Y-m-d H:i:s')
                 ])
             ) {
-                $lastInsertId = $this->pdo->lastInsertId();
-                $addressRequest->setId($lastInsertId);
+                $last_inserted_id = $this->pdo->lastInsertId();
+                $addressRequest->setId($last_inserted_id);
 
-                $this->logger->info("Entry with #id $lastInsertId was succsessfully created");
+                $this->logger->info("Entry with #id $last_inserted_id was successfully created");
 
                 return $addressRequest;
             }

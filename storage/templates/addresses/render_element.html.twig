@@ -1,0 +1,14 @@
+<div class="card text-center">
+    <div class="card-header">
+        {{ address.full_address }}
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">Подробная информация</h5>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">Административный округ: {{ address.city_area }}</li>
+            <li class="list-group-item">Район: {{ address.city_district }}</li>
+            <li class="list-group-item">Улица: {{ address.street }}</li>
+            <li class="list-group-item">Дом: {{ address.house }}</li>
+        </ul>
+    </div>
+</div>

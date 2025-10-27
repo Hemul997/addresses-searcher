@@ -21,7 +21,9 @@ class AddressRequestService
 
     /**
      * @param string $searchAddress
-     * @return array{string}
+     * @return array{
+     *     full_address: string, city_district: string, city_area: string, street: string, house: string
+     * }
      */
     public function search(string $searchAddress): array
     {
@@ -29,12 +31,12 @@ class AddressRequestService
 
         try {
             if (!empty($searchAddress)) {
+                // Ограничение по городу
                 $moscow_restrictions = [
-                    "locations" =>
-                    ["kladr_id" => "77"]
+                    "locations" => ["kladr_id" => "77"]
                 ];
 
-                $dadata_result = $this->searchAddress($searchAddress, $moscow_restrictions);
+                $dadata_result = $this->searchByAddressLine($searchAddress, $moscow_restrictions);
 
                 if ($this->repository->isUniqueSearchText($searchAddress)) {
                     $model = new AddressRequest($searchAddress, Carbon::now());
@@ -53,7 +55,15 @@ class AddressRequestService
             }
             if (!empty($dadata_result)) {
                 foreach ($dadata_result as $address) {
-                    $result[] = $address['unrestricted_value'];
+                    $data = $address['data'];
+                    // TODO Move to some Resource file
+                    $result[] = [
+                        'full_address'  => $address['unrestricted_value'],
+                        'city_district' => $data['city_district_with_type'] ?? 'Не заполнено',
+                        'city_area'     => $data['city_area'] ?? 'Не заполнено', // район
+                        'street'        => $data['street_with_type'] ?? 'Не заполнено',
+                        'house'         => $data['house'] ?? 'Не заполнено'
+                    ];
                 }
             }
         } catch (\Exception | GuzzleException $exception) {
@@ -67,7 +77,7 @@ class AddressRequestService
      * @throws GuzzleException
      * @throws JsonException
      */
-    private function searchAddress(string $searchTerm, array $args = []): array
+    private function searchByAddressLine(string $searchTerm, array $args = []): array
     {
         return $this->dadataClient->suggest(
             name: DadataClient::ADDRESS_SEARCH_TYPE,

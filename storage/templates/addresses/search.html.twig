@@ -2,29 +2,38 @@
 <html lang="ru">
 
 <head>
-    <title>Addresses search</title>
+    <title>Адреса города Москвы</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </head>
 <body>
-<h1>{{ page_title }}</h1>
+<nav class="navbar navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand">{{ page_title }}</a>
+        <form class="container-fluid" method="POST" action="/addresses/search">
+            <div class="input-group">
+                <input class="form-control me-2" name="address" id="address" value="" type="text" placeholder="Введите адрес города Москвы" aria-label="Поиск" required autocomplete="off">
+                <button class="btn btn-outline-success" type="submit">Поиск</button>
+            </div>
+            {% if addresses|length > 0 %}
+                <a href="{{ base_path() }}" class="btn btn-sm btn-outline-secondary mt-2" type="button">Очистить форму</a>
+            {% endif %}
+        </form>
+
+    </div>
+</nav>
 <div class="container">
-    <form class="row g-3" method="POST" action="/addresses/search">
-        <div class="col-auto">
-            <label for="address" class="form-label">Введите адрес города Москвы</label>
-            <input type="text" name="address" class="form-control" id="address" value="">
+    {% if addresses|length > 0 %}
+
+        <div class="row">
+            {% for address in addresses %}
+                <div class="col-sm-4">
+                    {{ include('addresses/render_element.html.twig') }}
+                </div>
+            {% endfor %}
         </div>
-        <div class="col-auto">
-            <button type="submit" class="btn btn-primary mb-3">Отправить</button>
-        </div>
-    </form>
+
+    {% endif %}
 </div>
-{% if addresses|length > 0 %}
-    <ul>
-        {% for address in addresses %}
-            <li>{{ address }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
 </body>
 </html>
